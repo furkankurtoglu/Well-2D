@@ -167,6 +167,8 @@ void create_cell_types( void )
     KRAS_negative = cell_defaults;
     KRAS_negative.type = 2;
     
+    KRAS_positive = cell_defaults;
+    KRAS_positve.type = 3;
 
 
 
