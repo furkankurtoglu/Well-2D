@@ -92,9 +92,7 @@ void create_cell_types( void )
 	cell_defaults.type = 0; 
 	cell_defaults.name = "default cell"; 
 	
-	// set default cell cycle model 
 
-	cell_defaults.functions.cycle_model = live; 
 	
 	// set default_cell_functions; 
 	
@@ -120,23 +118,41 @@ void create_cell_types( void )
 	int apoptosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Apoptosis" );
 	int necrosis_model_index = cell_defaults.phenotype.death.find_death_model_index( "Necrosis" );
 
-
-	int start_index = live.find_phase_index( PhysiCell_constants::live_phase );
-	int end_index = live.find_phase_index( PhysiCell_constants::live_phase );
-
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
     cell_defaults.phenotype.death.rates[apoptosis_model_index] = 1.0; 
 
+
+	// set default cell cycle model 
+
+	cell_defaults.functions.cycle_model = live; 
+	int start_index = live.find_phase_index( PhysiCell_constants::live );
+	int end_index = live.find_phase_index( PhysiCell_constants::live );
+    cell_defaults.phenotype.cycle.data.transition_rate(start_index,end_index) = 0.0;
+
     // metabolite indices
-    int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" ); 
+    int oxygen_substrate_index = microenvironment.find_density_index( "oxygen" );
+    int glucose_substrate_index = microenvironment.find_density_index( "glucose" );
+    int glutamine_substrate_index = microenvironment.find_density_index( "glutamine" );
+    int lactate_substrate_index = microenvironment.find_density_index( "lactate" );
+    
 
 	// set oxygen uptake / secretion parameters for the default cell type 
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 0.0; 
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_substrate_index] = 0; 
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_substrate_index] = 0.0; 
 	
+    cell_defaults.phenotype.secretion.uptake_rates[glucose_substrate_index] = 0.0; 
+	cell_defaults.phenotype.secretion.secretion_rates[glucose_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[glucose_substrate_index] = 0.0; 
     
+	cell_defaults.phenotype.secretion.uptake_rates[glutamine_substrate_index] = 0.0; 
+	cell_defaults.phenotype.secretion.secretion_rates[glutamine_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[glutamine_substrate_index] = 0.0; 
+
+	cell_defaults.phenotype.secretion.uptake_rates[lactate_substrate_index] = 0.0; 
+	cell_defaults.phenotype.secretion.secretion_rates[lactate_substrate_index] = 0; 
+	cell_defaults.phenotype.secretion.saturation_densities[lactate_substrate_index] = 0.0;     
     
     
 	// no motility
@@ -149,8 +165,7 @@ void create_cell_types( void )
     cell_defaults.custom_data.add_variable( "glutamine_i_conc", "mMolar", 0.0);
     cell_defaults.custom_data.add_variable( "lactate_i_conc" , "mMolar", 0.0 ); 
     cell_defaults.custom_data.add_variable( "energy", "a.u", 0.0);
-	
-	
+		
     
     // Definition of Fibroblast
     fibroblast = cell_defaults;
@@ -160,15 +175,30 @@ void create_cell_types( void )
     // making sure that cells copy the paramters from cell_defaults
     fibroblast.parameters.pReference_live_phenotype = &( fibroblast.phenotype ); 
     
+    // lactate uptake rate
+    fibroblast.phenotype.secretion.uptake_rates[lactate_substrate_index] = 0.1; 
 
 
-
-    // Space for Shannon to create KRAS_negative and KRAS_positive types
+    // Create KRAS_negative and KRAS_positive types
+    
+    // Definition of KRAS negative
     KRAS_negative = cell_defaults;
     KRAS_negative.type = 2;
     
+    // KRAS negative uptake rates for glucose, glutamine, and oxygen
+    KRAS_negative.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 0.1;
+    KRAS_negative.phenotype.secretion.uptake_rates[glucose_substrate_index] = 0.01;
+    KRAS_negative.phenotype.secretion.uptake_rates[glutamine_substrate_index] = 0.0001;
+    
+    // KRAS negative lactate secretion
+	KRAS_negative.phenotype.secretion.secretion_rates[lactate_substrate_index] = 0.001; 
+	KRAS_negative.phenotype.secretion.saturation_densities[lactate_substrate_index] = 10.0;     
+    
+    
+    
+    // Definition of KRAS positive
     KRAS_positive = cell_defaults;
-    KRAS_positve.type = 3;
+    KRAS_positive.type = 3;
 
 
 
@@ -232,19 +262,12 @@ void setup_tissue( void )
 	
 	Cell* pC;
 
-	pC = create_cell(); 
-	pC->assign_position( 0.0, 0.0, 0.0 );
-
-	pC = create_cell(); 
-	pC->assign_position( -100, 0, 0.0 );
+	// now create a fibroblast cell 
 	
-	pC = create_cell(); 
-	pC->assign_position( 0, 100, 0.0 );
-	
-	// now create a motile cell 
-	
-	pC = create_cell( motile_cell ); 
+	pC = create_cell( fibroblast ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
+    
+    
 	
 	return; 
 }
@@ -257,7 +280,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 		
 	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
 	{
-		 output[0] = "black"; 
+		 output[0] = "blue"; 
 		 output[2] = "black"; 
 	}
 	
