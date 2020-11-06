@@ -191,8 +191,8 @@ void create_cell_types( void )
     KRAS_negative.phenotype.secretion.uptake_rates[glutamine_substrate_index] = 0.0001;
     
     // KRAS negative lactate secretion
-	KRAS_negative.phenotype.secretion.secretion_rates[lactate_substrate_index] = 0.001; 
-	KRAS_negative.phenotype.secretion.saturation_densities[lactate_substrate_index] = 10.0;     
+    KRAS_negative.phenotype.secretion.secretion_rates[lactate_substrate_index] = 0.001; 
+    KRAS_negative.phenotype.secretion.saturation_densities[lactate_substrate_index] = 10.0;     
     
     
     
@@ -200,7 +200,14 @@ void create_cell_types( void )
     KRAS_positive = cell_defaults;
     KRAS_positive.type = 3;
 
-
+    // KRAS positive uptake rates for glucose, glutamine, and oxygen
+    KRAS_positive.phenotype.secretion.uptake_rates[oxygen_substrate_index] = 0.5;
+    KRAS_positive.phenotype.secretion.uptake_rates[glucose_substrate_index] = 0.05;
+    KRAS_positive.phenotype.secretion.uptake_rates[glutamine_substrate_index] = 0.0005;
+	
+    // KRAS positve lactate secretion
+    KRAS_positive.phenotype.secretion.secretion_rates[lactate_substrate_index] = 0.005; 
+    KRAS_positive.phenotype.secretion.saturation_densities[lactate_substrate_index] = 20.0;  
 
 
     //
