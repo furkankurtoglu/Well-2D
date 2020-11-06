@@ -274,7 +274,11 @@ void setup_tissue( void )
 	pC = create_cell( fibroblast ); 
 	pC->assign_position( 15.0, -18.0, 0.0 );
     
-    
+    	pC = create_cell( KRAS_positive );
+	pC->assign_position( 0.0, 0.0, 0.0);
+
+	pC = create_cell( KRAS_negative );
+	pC->assign_position( 10.0, 10.0, 0.0 );
 	
 	return; 
 }
