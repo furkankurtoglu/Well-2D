@@ -120,7 +120,7 @@ void create_cell_types( void )
 
 	// initially no necrosis 
 	cell_defaults.phenotype.death.rates[necrosis_model_index] = 0.0; 
-    cell_defaults.phenotype.death.rates[apoptosis_model_index] = 1.0; 
+    cell_defaults.phenotype.death.rates[apoptosis_model_index] = 0.0; 
 
 
 	// set default cell cycle model 
